@@ -1,0 +1,256 @@
+
+    #Casos de prueba asociados al usario visual_user
+
+
+Feature: Validar acceso al sistema - Login
+    Como usuario visual_user, quiero ingresar al sistema por medio de las credenciales de acceso.
+
+    @login
+    Scenario Outline: Iniciar sesión al sistema
+        Given un formulario en la interfaz de login
+        When el usuario diligencia el formulario: Usuario "<username>" Contraseña "<Password>"
+            And hace clic en el boton "Login"
+        Then el usuario se ha logueado
+    Examples:
+        | username    | passwoord    |
+        | visual_user | secret_sauce |
+
+
+    @invalidLogin
+    Scenario: Verificar mensaje de error al ingresar una contarseña incorrecta
+        Given un formulario en la interfaz de login
+        When el usuario diligencia el formulario: Usuario "<username>" Contraseña "<error>"
+            And hace clic en el boton "Login"
+        Then el usuario visualiza mensaje de error
+
+
+
+Feature: Verificar elementos del menú de navegación
+    Como usuario visual_user logueado, quiero navegar por los items que componen el menú de navegación principal.
+
+    @navbar
+    Background:
+        Given un elemento de navegación a la izquierda de la interfaz del header
+
+    Scenario: Interactuar con el primer item del navbar
+        When el usuario hace clic en el ícono "<navbar>"
+            And procede hacer clic en la opción "<ALL ITEMS>"
+        Then el usuario visualiza la carga de los productos del ecommerce
+            
+
+    Scenario: Interactuar con el segundo item del navbar
+        When el usuario hace clic en el ícono "<navbar>"
+            And procede hacer clic en la opción "<ABOUT>"
+        Then el usuario visualiza una nueva ruta que comprende la información relacionada acerca del ecommerce
+
+    Scenario: Interactuar con el tercer item del navbar
+        When el usuario hace clic en el ícono "<navbar>"
+            And procede hacer clic en la opción "<LOGOUT>"
+        Then el usuario cierra la sesión
+
+    Scenario: Interactuar con el cuarto item del navbar
+        When el usuario hace clic en el ícono "<navbar>"
+            And procede hacer clic en la opción "<RESET APP STATE>"
+        Then el usuario visualiza que la aplicación se ha restablecido
+            #Reporte para Bug
+
+    @filtroConsulta
+    Scenario Outline: Verificar que cada filtro de consulta ordene los productos de forma ascendente/descendente
+        Given un campo de tipo select a la derecha de la interfaz
+        When el usuario hace clic en el button select de consulta "<order>"
+            And selecciona cada uno de las opciones del "<order>"
+        Then el usuario visualiza el orden de los productos de manera ascendente/descendente de acuerdo al nombre y precio
+            But la imagen del primer registro del catálogo es la misma para los demás productos
+    Examples:
+        | Order               |
+        | Name (A to Z)       |
+        | Name (Z to A)       |
+        | Price (low to high) |
+        | Price (high to low) |
+       
+        #Reporte para Bug
+
+Feature: Verificar las caracteriticas de cada tag de productos
+    Como usuario visual_user logueado, quiero ver la imagen, nombre, descripción y precio de cada producto
+
+    @tagProducto
+    Scenario: Verificar la imagen, nombre, descripción y precio de cada producto
+        Given una lista de productos en la vista "<inventory>"
+        When el usuario hace scroll para visualizar los tags de productos
+            And hace clic en cada uno de los tags de productos
+        Then el usuario visualiza la imagen, nombre, descripción y precio de cada producto
+            But el usuario visualiza que el button "<Add to Cart>" del item "<3>" no está ajustado al tag del producto
+                #Reporte para Bug
+
+    @backInventory
+    Scenario: Retornar a la vista del catálogo de productos "<inventario>"
+        Given un producto en el view "<inventory-item>"
+        When el usuario detalla las caracteristicas del producto
+            And hace clic en el button "<Back to Products>"
+        Then el sistema retorna al usuario al view "<inventory>"
+
+
+Feature: Verificar que los productos se agregen al carrito de compras
+    Como usuario visual_user logueado, quiero agregar productos al carrito de compras
+
+    @addCart
+    Background:
+        Given una lista de productos en las vistas: Inventario "<inventory" Detalle Producto "<inventory-item>"
+
+    Scenario: Verificar en cada tag de producto la opción de agregar al carrito de compras
+        When el usuario hace clic en button "<Add To cart>" del view "<inventory>"
+        Then el usuario visualiza una notificación en el ícono del carrito de compras
+
+    Scenario: Verificar en cada view del producto la opción de agregar al carrito de compras
+        When el usuario hace clic en button "<Add To cart>" del view "<inventory-item>"
+        Then el usuario visualiza una notificación en el ícono del carrito de compras
+
+    @iconCart
+    Scenario: Revisar la ubicación del ícono cart
+        Given un elemento en la interfaz definido como un button icon cart
+        When el usuario inicia sesión
+            And accede a la ruta del view "<inventory-item>"
+            And accede a la ruta del view "<cart>"
+            And hace clic en el button "<checkout>"
+            And hace clic en finalizar compra
+        Then el sistema muestra el ícono cart no alineado a la interfaz
+            #Reporte para Bug
+    Examples:
+        | Endpoint                                           |
+        | https://www.saucedemo.com/inventory.html           |
+        | https://www.saucedemo.com/inventory-item.html?id=4 |
+        | https://www.saucedemo.com/cart.html                |
+        | https://www.saucedemo.com/checkout-step-one.html   |
+        | https://www.saucedemo.com/checkout-complete.html   |
+
+    @viewaddCart
+    Scenario: Verificar la lista de productos agregados al carrito de compras
+        Given algunos productos agregados al carrtio de compras
+        When el usuario hace clic en el button icon del carrito
+        Then el sistema lista los productos agregagos en el view Cart
+            But el sistema muestra el button "<Checkout>" no alineado a la interfaz
+                #Reporte para Bug
+
+Feature: Remover los productos agregados al carrito de compras
+    Como usuario visual_user logueado, quiero remover los productos agregados al carrito de compras
+
+    @remove
+    Background:
+        Given un conjunto de productos listados en el carrito de compras
+
+    Scenario: Remover el producto del carrito de compras desde el view "<Cart>"
+        When el usuario hace clic en el button "<Remove>" del view "<Cart>"
+        Then el producto ya no se visualiza en el carrito de compras
+            And el producto queda habilitado para agregarlo nuevamente al carrito
+
+    Scenario: Remover el producto del carrito de compras desde el view "<inventory>"
+        When el usuario hace clic en el button "<Remove>" del view "<inventory>"
+        Then el usuario visualiza que la notificación del button icon del carrito disminuye en 1 unidad
+            And el producto queda habilitado para agregarlo nuevamente al carrito
+
+    Scenario: Remover el producto del carrito de compras desde el view "<inventory-item>"
+        When el usuario hace clic en el button "<Remove>" del view "<inventory-item>"
+        Then el usuario detalla que la notificación del button icon del carrito disminuye en 1 unidad quedando sin productos
+            And el producto queda habilitado para agregarlo nuevamente al carrito
+
+    Examples:
+        | Product                  | View           | Endpoint                                           |
+        | Sauce Labs Fleece Jacket | inventory      | https://www.saucedemo.com/inventory.html           |
+        | Sauce Labs Bike Light    | inventory-item | https://www.saucedemo.com/inventory-item.html?id=0 |
+        | Sauce Labs Bolt T-Shirt  | Cart           | https://www.saucedemo.com/cart.html                |
+
+Feature: Verificar cantidades añadidas o removidas de los productos en el carrito de compras
+    Como usuario visual_user logueado, quiero agregar y quitar cantidades a los productos agregados al carrito de compras
+
+    @addCantidades
+    Scenario: Añañdir y quitar cantidades del producto
+        Given una lista de productos en el view  "<Cart>"
+        When el usuario hace clic en el recuadro numérico de la columna "QTY"
+        Then el usuario no añade cantidades
+            #Reporte para Bug
+
+Feature: Verificar la opción de continuar la compra agregando más productos al carrito de compras
+    Como usuario visual_user logueado, quiero retornar al catálogo de productos desde el carrito de compras
+
+    @continueShopping
+    Scenario: Retornar a la vista del catálogo de productos "<inventario>"
+        Given una lista de productos en el view "<Cart>"
+        When el usuario hace clic en el button "<Continue Shopping>"
+        Then el sistema retorna al usuario al view "<inventory>"
+
+Feature: Verificar la compra de los productos
+    Como usuario visual_user logueado, quiero realizar la compra de mis productos agergados al carrito
+
+    @checkout
+    Scenario Outline: Hacer checkout de los productos agregados al carrito de compras
+        Given una lista de productos en el view "<Cart>"
+        When el usuario hace clic en el button "<Checkout>"
+        Then el sistema direcciona al usuario a una nueva interfaz para realizar la compra de los productos
+    Examples:
+        | Products                 |
+        | Sauce Labs Onesie        |
+        | Sauce Labs Fleece Jacket |
+        | Sauce Labs Bolt T-Shirt  |
+
+    @checkoutForm
+    Scenario Outline: Verificar los campos del formulario para continuar la compra
+        Given un formulario para el registro de la información del usuario
+        When el usuario ingresa el nombre en el primer TextBox
+            And ingresa el apellido en el segundo TextBox
+            And registra en el tercer TextBox el código postal
+            And hace clic en el button "<Continue>"
+        Then el sistema muestra el resumen de la compra
+    Examples:
+        | Name        | Last Name      | Codigo postal |
+        | Luisa Maria | Vargas Perdomo | 41001         |
+
+        |     Products            |  cantidad  | valor Precio| total Precio | Total |
+        |Sauce Labs Onesie    |    1       | 7.99 |       |
+        |Sauce Labs Fleece Jacket    |    1       |49.99  | 73.97| 79.89|
+        |Sauce Labs Bolt T-Shirt |    1       |15.99  |       | |
+
+
+    @finish
+    Scenario: Finalizar la compra de productos
+        Given ul formulario de compra con previo diligenciamiento
+        When el usuario verifica el detalle de la compra
+            And hace clic en el button "<Finish>"
+        Then el usuario visualiza una alerta success de la compra finalizada
+        Then el sistema muesta un button de "<Bck home>"
+            And el usuario hace clic en el button "<Back home>"
+        Then el sistema retorna al usuario a la interfaz principal de la apicación
+
+    @checkoutCancel
+    Scenario: Cancelar el proceso de compra
+        Given el checkout de la compra
+        When el usuario diligencia o NO el formulario de compra
+            And hace clic en el button "<Cancel>"
+        Then el sistema retorna al usuario al view "<Cart>"
+
+
+    @checkoutContinueNull
+    Scenario: Continuar la compra de los productos sin registro de información
+        Given el formulario del checkout de la compra vacío
+        When el usuario no registre ninguna información
+            And el usuario hace clic en el button "<Continue>"
+        Then el sistema muestra mensaje de error para no continuar con el proceso
+
+    @checkoutNull
+    Scenario: Realizar la compra sin previa selección de productos
+        Given un usuario situado en el view "<Cart>"
+        When el usuario no agrega productos
+            And hace clic en el button "<Checkout>"
+            And diligencia el formulario de compra
+            And hace clic en el button "<Continue>"
+        Then el sistema muestra el resumen de compra con valor "<$0.00>"
+            And el usuario hace clic en el button "<Finish>"
+        Then el sistema muestra alerta success de la compra realizada
+            But el sistema NO debe permitir la compra si no hay productos agregados al carrito - Bug
+                #Reporte para Bug
+
+Feature: Verificar tiempo de interacción con el sistema
+    Como usuario standar_user quiero hacer login y no realizar activdiades en la aplicación
+    Scenario: Verificar tiempo de inactividad para cerrr la sesión del usuario
+        Given el usuario logueado
+        When el usuario permanece con inactividad en el sistema en un determinado tiempo
+        Then el sistema cierra la sesión del usuario
