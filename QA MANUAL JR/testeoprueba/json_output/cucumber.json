@@ -1,0 +1,73 @@
+[
+  {
+    "comments": [
+      {
+        "line": 2,
+        "value": "#Casos de prueba asociados al usario standar_user"
+      }
+    ],
+    "line": 5,
+    "elements": [
+      {
+        "line": 16,
+        "name": "Iniciar sesión al sistema",
+        "description": "",
+        "id": "validar-acceso-al-sistema---login;iniciar-sesión-al-sistema;;2",
+        "type": "scenario",
+        "keyword": "Scenario Outline",
+        "steps": [
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 10,
+            "name": "un formulario en la interfaz de login",
+            "match": {},
+            "keyword": "Given "
+          },
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 11,
+            "name": "el usuario diligencia el formulario: Usuario \"standard_user\" Contraseña \"\u003cPassword\u003e\"",
+            "match": {},
+            "matchedColumns": [
+              0
+            ],
+            "keyword": "When "
+          },
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 12,
+            "name": "hace clic en el boton \"Login\"",
+            "match": {},
+            "keyword": "And "
+          },
+          {
+            "result": {
+              "status": "undefined"
+            },
+            "line": 13,
+            "name": "el usuario se ha logueado",
+            "match": {},
+            "keyword": "Then "
+          }
+        ],
+        "tags": [
+          {
+            "line": 8,
+            "name": "@login"
+          }
+        ]
+      }
+    ],
+    "name": "Validar acceso al sistema - Login",
+    "description": "  Como usuario standar_user, quiero ingresar al sistema por medio de las credenciales de acceso.",
+    "id": "validar-acceso-al-sistema---login",
+    "keyword": "Feature",
+    "uri": "C:/Users/falco/eclipse-workspace/testeoprueba/src/test/resources/features/testcaseUser1.feature"
+  }
+]
